@@ -56,9 +56,9 @@
 // Завантажувач p.error можеш використовувати будь-яку бібліотеку з гарними сповіщеннями, наприклад Notiflix
 
 import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
-// import SlimSelect from 'slim-select';
-// import { Notify } from 'notiflix/build/notiflix-notify-aio';
-// import 'slim-select/dist/slimselect.css';
+import SlimSelect from 'slim-select';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import 'slim-select/dist/slimselect.css';
 
 const selectors = {
   select: document.querySelector('.breed-select'),
@@ -84,11 +84,47 @@ fetchBreeds()
 
     selectors.select.innerHTML = markup;
 
-    // new SlimSelect({
-    //   select: '.breed-select',
-    // });
+    new SlimSelect({
+      select: '.breed-select',
+    });
 
     selectors.select.addEventListener('change', onSelectBreed);
     selectors.select.classList.remove('is-hidden');
   })
   .catch(error => onError(error));
+
+function onError() {
+  selectors.select.classList.remove('is-hidden');
+  selectors.loader.classList.add('is-hidden');
+  selectors.catInfo.classList.add('is-hidden');
+}
+
+function onSelectBreed(breed) {
+  selectors.select.classList.add('is-hidden');
+  selectors.loader.classList.remove('is-hidden');
+  selectors.catInfo.classList.add('is-hidden');
+
+  const breedId = breed.currentTarget.value;
+
+  fetchCatByBreed(breedId)
+    .then(data => {
+      selectors.select.classList.remove('is-hidden');
+      selectors.loader.classList.add('is-hidden');
+      selectors.catInfo.classList.remove('is-hidden');
+
+      const { url, breeds } = data[0];
+
+      selectors.catInfo.innerHTML = `
+    <img class="cat-image" src="${url}" alt="${breeds[0].name}"/>
+    <h2 class="breed">${breeds[0].name}</h2>
+    <p class="description">${breeds[0].description}</p>
+    <p class="temperament">${breeds[0].temperament}</p>`;
+    })
+    .catch(error => onError(error));
+}
+
+Notify.failure('Oops! Something went wrong! Try reloading the page!', {
+  width: '320px',
+  position: 'center-top',
+  fontSize: '16px',
+});
