@@ -97,6 +97,12 @@ function onError() {
   selectors.select.classList.remove('is-hidden');
   selectors.loader.classList.add('is-hidden');
   selectors.catInfo.classList.add('is-hidden');
+
+  Notify.failure('Oops! Something went wrong! Try reloading the page!', {
+    width: '320px',
+    position: 'center-top',
+    fontSize: '16px',
+  });
 }
 
 function onSelectBreed(breed) {
@@ -115,16 +121,12 @@ function onSelectBreed(breed) {
       const { url, breeds } = data[0];
 
       selectors.catInfo.innerHTML = `
-    <img class="cat-image" src="${url}" alt="${breeds[0].name}"/>
+    <div class="cat-image-wrapper">
+      <img class="cat-image" src="${url}" alt="${breeds[0].name}"/>
+    </div>
     <h2 class="breed">${breeds[0].name}</h2>
     <p class="description">${breeds[0].description}</p>
     <p class="temperament">${breeds[0].temperament}</p>`;
     })
     .catch(error => onError(error));
 }
-
-Notify.failure('Oops! Something went wrong! Try reloading the page!', {
-  width: '320px',
-  position: 'center-top',
-  fontSize: '16px',
-});
